@@ -9,7 +9,7 @@ let inputLines: string[] = [];
 let currentLine: number = 0;
 
 // Simulate input
-let simulateInput = `1`
+let simulateInput = ``
 
 
 
