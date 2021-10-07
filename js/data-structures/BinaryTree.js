@@ -11,6 +11,12 @@ class BinaryTreeNode {
   resetCache() {
     this.cache = {};
   }
+  setChildRight(child) {
+    this.right = child;
+  }
+  setChildLeft(child) {
+    this.left = child;
+  }
   calcLevel(startingIndex = 1) {
     if (this.cache.level) return this.cache.level;
     if (!this.parent) return startingIndex;
@@ -70,7 +76,7 @@ class BinaryTreeNode {
   executeForAllNodesPostOrder(action) {
     this.postOrderTraverse().map(action);
   }
-  print(prefix = '', isTail) {
+  print(prefix = '', isTail = false) {
     let nodeType = !this.parent ? `-` : this.parent.right === this ? `r` : `l`;
     console.log(prefix + `|-${nodeType} ${this.value} {${this.calcLevel()}}`);
     if (this.left) {
