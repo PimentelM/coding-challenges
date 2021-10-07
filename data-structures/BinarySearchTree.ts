@@ -56,7 +56,7 @@ export class BinarySearchTree {
       }
     }
 
-    function deleteNodeAndReturnReplacement(deletedNode, parent): BinaryNode {
+    function deleteNodeAndReturnReplacement(deletedNode : BinaryNode, parent:BinaryNode): BinaryNode {
       // No need to do further operations, just replace it with undefined
       if (deletedNode.hasNoChilds) return undefined;
 
@@ -92,7 +92,7 @@ export class BinarySearchTree {
     }
   }
 
-  findNodeWithValue(value, node: BinaryNode = this.root): BinaryNode {
+  findNodeWithValue(value: number, node: BinaryNode = this.root): BinaryNode {
     if (!node) return undefined;
     if (node.value === value) return node;
 

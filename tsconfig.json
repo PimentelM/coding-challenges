@@ -4,7 +4,8 @@
     "target": "es2019",
     "sourceMap": true,
     "lib": ["es2019", "dom"],
-    "outDir": "js"
+    "outDir": "js",
+    "noImplicitAny": true
   },
   "exclude": [
     "node_modules",
