@@ -1,3 +1,4 @@
+
 // Data structure written by Mateus Pimentel
 export class BinaryTreeNode {
     parent: BinaryTreeNode;
@@ -62,8 +63,27 @@ export class BinaryTreeNode {
         return result
     }
 
-    executeForAllNodes(action : (node: BinaryTreeNode) => void){
-        this.inOrderTraverse().map(action)
+    postOrderTraverse() : BinaryTreeNode[]{
+        let result = [];
+
+        // Traverse left node
+        if (this.left){
+            result.push(...this.left.postOrderTraverse())
+        }
+
+        // Traverse Right Node
+        if (this.right){
+            result.push(...this.right.postOrderTraverse())
+        }
+
+        // Adds current value
+        result.push(this)
+
+        return result
+    }
+
+    executeForAllNodes(order : "pre" | "post" | "in", action : (node: BinaryTreeNode) => void){
+        this[`${order}OrderTraverse`]().map(action)
     }
 
     executeForAllNodesInOrder(action : (node: BinaryTreeNode) => void){
@@ -72,6 +92,10 @@ export class BinaryTreeNode {
 
     executeForAllNodesPreOrder(action : (node: BinaryTreeNode) => void){
         this.preOrderTraverse().map(action)
+    }
+
+    executeForAllNodesPostOrder(action : (node: BinaryTreeNode) => void){
+        this.postOrderTraverse().map(action)
     }
 
 
