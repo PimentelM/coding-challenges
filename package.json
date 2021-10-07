@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.ts",
   "scripts": {
-    "test": "echo OK",
+    "test": "jest",
     "prepare": "husky install",
     "lintAndCheck": "npx tsc --noEmit && npx lint-staged"
   },
