@@ -1,14 +1,15 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "target": "es2020",
+    "target": "es2019",
     "sourceMap": true,
-    "lib": ["es2020", "dom"],
+    "lib": ["es2019", "dom"],
     "outDir": "js"
   },
   "exclude": [
     "node_modules",
     "js"
-  ]
+  ],
+  "types": ["@types/jest"]
 
 }
