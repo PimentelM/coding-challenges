@@ -1,5 +1,9 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-npm test
-yarn lintAndCheck
+BRANCH=`git rev-parse --abbrev-ref HEAD`
+
+if [[ "$BRANCH" =~ ^(master|main|develop)$ ]]; then
+  npm test
+  yarn lintAndCheck
+fi
