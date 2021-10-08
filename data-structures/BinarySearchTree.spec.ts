@@ -13,13 +13,13 @@ describe(`Testing Binary Search Tree`, () => {
       });
   });
 
-  it('Should be able to create the tree', () => {
+  it('In order traverse of the tree should be crescent', () => {
     let result = tree.root
-      .levelOrderTraverse()
+      .inOrderTraverse()
       .map(x => x.value)
       .join(' ');
 
-    expect(result).toBe('6 4 8 3 5 7 9');
+    expect(result).toBe('3 4 5 6 7 8 9');
   });
 
   it('Should be able to find a node if it exists', () => {

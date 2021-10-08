@@ -4,7 +4,7 @@ describe('Testing Binary Tree', () => {
   let tree: BinaryNode;
 
   beforeEach(() => {
-    tree = new BinaryNode(6);
+    tree = new BinaryNode(6, {});
 
     let l = tree.addLeftNode(4);
     l.addLeftNode(3);

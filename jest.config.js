@@ -1,5 +1,10 @@
 module.exports = {
   roots: ['<rootDir>'],
+  globals: {
+    'ts-jest': {
+      isolatedModules: true
+    }
+  },
   transform: {
     '^.+\\.tsx?$': 'ts-jest',
   },

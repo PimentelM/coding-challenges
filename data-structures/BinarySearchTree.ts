@@ -13,14 +13,14 @@ export class BinarySearchTree {
     }
 
     if (value < parent.value) {
-      if (!parent.left) {
-        parent.left = new BinaryNode(value, data, parent);
+      if (!parent.hasLeftChild()) {
+        parent.addLeftNode(value, data);
       } else {
         this.addNode(value, data, parent.left);
       }
     } else {
-      if (!parent.right) {
-        parent.right = new BinaryNode(value, data, parent);
+      if (!parent.hasRightChild()) {
+        parent.addRightNode(value, data);
       } else {
         this.addNode(value, data, parent.right);
       }

@@ -8,7 +8,7 @@
     "prepare": "husky install",
     "lintAndCheck": "npx tsc --noEmit && npx lint-staged",
     "start" : "npx ts-node ./index.ts",
-    "build" : "npx lint-staged && npx tsc"
+    "build" : "npx tsc"
   },
   "keywords": [],
   "author": "",

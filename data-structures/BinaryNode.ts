@@ -9,7 +9,7 @@ export class BinaryNode {
 
   private cache: any = {};
 
-  constructor(value: number, parent: BinaryNode = undefined, data: any = undefined) {
+  constructor(value: number, data: any,parent: BinaryNode = undefined) {
     this.parent = parent;
     this.value = value;
     this.data = data;
@@ -56,13 +56,13 @@ export class BinaryNode {
   addRightNode(value: number, data: any = undefined) {
     if (this.right) throw new Error('Node already exists');
 
-    return (this.right = new BinaryNode(value, this, data));
+    return (this.right = new BinaryNode(value, data, this));
   }
 
   addLeftNode(value: number, data: any = undefined) {
     if (this.left) throw new Error('Node already exists');
 
-    return (this.left = new BinaryNode(value, this, data));
+    return (this.left = new BinaryNode(value, data, this));
   }
 
   setValue(value: number) {
@@ -163,24 +163,28 @@ export class BinaryNode {
     return result;
   }
 
-  executeForAllNodes(action: (node: BinaryNode) => void, order: 'level' | 'in' | 'pre' | 'post' = 'level') {
-    this[`${order}OrderTraverse`]().map(action);
+  nodeCount() : number {
+    return this.inOrderTraverse().length;
   }
 
-  executeForAllNodesInLevelOrder(action: (node: BinaryNode) => void) {
-    this.levelOrderTraverse().map(action);
+  executeForAllNodes(action: (node: BinaryNode) => any){
+    return this.executeForAllNodesInLevelOrder(action)
   }
 
-  executeForAllNodesInOrder(action: (node: BinaryNode) => void) {
-    this.inOrderTraverse().map(action);
+  executeForAllNodesInLevelOrder(action: (node: BinaryNode) => any) {
+    return this.levelOrderTraverse().map(action);
   }
 
-  executeForAllNodesPreOrder(action: (node: BinaryNode) => void) {
-    this.preOrderTraverse().map(action);
+  executeForAllNodesInOrder(action: (node: BinaryNode) => any) {
+    return this.inOrderTraverse().map(action);
   }
 
-  executeForAllNodesPostOrder(action: (node: BinaryNode) => void) {
-    this.postOrderTraverse().map(action);
+  executeForAllNodesPreOrder(action: (node: BinaryNode) => any) {
+    return this.preOrderTraverse().map(action);
+  }
+
+  executeForAllNodesPostOrder(action: (node: BinaryNode) => any) {
+    return this.postOrderTraverse().map(action);
   }
 
   print(prefix = '', isTail = false) {
