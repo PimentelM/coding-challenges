@@ -9,7 +9,13 @@
   },
   "exclude": [
     "node_modules",
-    "js"
+    "js",
+    "**/*.spec.ts",
+    "challenges"
+  ],
+  "include": [
+    "data-structures",
+    "algorithms"
   ],
   "types": ["@types/jest"]
 

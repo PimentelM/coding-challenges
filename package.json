@@ -7,7 +7,8 @@
     "test": "jest",
     "prepare": "husky install",
     "lintAndCheck": "npx tsc --noEmit && npx lint-staged",
-    "start" : "npx ts-node ./index.ts"
+    "start" : "npx ts-node ./index.ts",
+    "build" : "npx lint-staged && npx tsc"
   },
   "keywords": [],
   "author": "",
