@@ -27,19 +27,18 @@ describe(`Testing Heap`, () => {
 
     it('All parent nodes should be smaller than their children', () => {
 
-        function isParentValueSmallerThanChildren(node: BinaryNode) : boolean {
-            if (node.hasLeftChild()){
-                if(node.value > node.left.value) return false
-            }
+        let results = heap.root.executeForAllNodes(heap.isParentValueSmallerThanChildren)
 
-            if(node.hasRightChild()){
-                if(node.value > node.right.value) return false
-            }
+        expect(results.every(x=>x)).toBe(true);
 
-            return true
-        }
 
-        let results = heap.root.executeForAllNodes(isParentValueSmallerThanChildren)
+    });
+
+    it('If heap is switched to max heap, all parent nodes should be greater than their children', () => {
+
+        heap.switchType();
+
+        let results = heap.root.executeForAllNodes(heap.isParentValueGreaterThanChildren)
 
         expect(results.every(x=>x)).toBe(true);
 

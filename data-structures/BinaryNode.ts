@@ -7,7 +7,7 @@ export class BinaryNode {
 
   data: any;
 
-  private cache: any = {};
+  private cache: { level?: number} = {};
 
   constructor(value: number, data: any,parent: BinaryNode = undefined) {
     this.parent = parent;
@@ -15,7 +15,7 @@ export class BinaryNode {
     this.data = data;
   }
 
-  resetCache() {
+  private resetCache() {
     this.cache = {};
   }
 
@@ -79,6 +79,29 @@ export class BinaryNode {
 
   setParent(node: BinaryNode) {
     this.parent = node;
+  }
+
+  // returns true when swap is executed successfully
+  swapValuesWith(node: BinaryNode): boolean {
+    if (!node) return false;
+
+
+    let thisValue = this.value;
+    let thisData = this.data;
+
+    let nodeData = node.data;
+    let nodeValue = node.value;
+
+    this.value = nodeValue;
+    this.data = nodeData;
+    this.resetCache();
+
+    node.value = thisValue;
+    node.data = thisData;
+    node.resetCache();
+
+
+    return true;
   }
 
   getLevel(startingIndex: number = 1, useCache: boolean = false): number {
