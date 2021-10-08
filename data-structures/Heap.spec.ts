@@ -4,9 +4,12 @@ import {BinaryNode} from "./BinaryNode";
 describe(`Testing Heap`, () => {
     let heap;
     let count;
+    let smallestElementAdded = Infinity;
+    let biggestElementAdded = -Infinity;
     beforeEach(() => {
         heap = new Heap();
         count = 0;
+
 
         '6 4 8 3 5 7 9'
             .split(' ')
@@ -14,6 +17,12 @@ describe(`Testing Heap`, () => {
             .forEach(value => {
                 heap.addNode(value);
                 count++;
+                if(value < smallestElementAdded){
+                    smallestElementAdded = value;
+                }
+                if(value > biggestElementAdded){
+                    biggestElementAdded = value;
+                }
             });
     });
 
@@ -44,6 +53,25 @@ describe(`Testing Heap`, () => {
 
 
     });
+
+    it('Should have a peek method that doesnt change heap size', ()=>{
+        let peek = heap.peek();
+
+        expect(peek).toBe(smallestElementAdded)
+        expect(heap.root.nodeCount()).toBe(count)
+    })
+
+
+    it('Should have a poll method that removes the element from the heap', ()=>{
+        expect(heap.root.nodeCount()).toBe(count)
+
+        let poll = heap.poll();
+
+        expect(poll).toBe(smallestElementAdded)
+        expect(heap.root.nodeCount()).toBe(count -1)
+    })
+
+
 
 
 });
