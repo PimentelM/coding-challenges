@@ -31,7 +31,7 @@ export class BinarySearchTree {
   private deleteNodeWithValue(value: number, parent: BinaryNode = this.root): boolean {
     if (!parent) return false;
 
-    if (parent.value === value && parent.calcLevel() === 1) {
+    if (parent.value === value && parent.getLevel() === 1) {
       this.root = deleteNodeAndReturnReplacement(this.root, undefined);
       return true;
     }

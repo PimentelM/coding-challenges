@@ -71,7 +71,7 @@ describe('Testing Binary Tree', () => {
 
     result = tree
       .levelOrderTraverse()
-      .map(x => x.calcLevel())
+      .map(x => x.getLevel())
       .join(' ');
 
     expect(result).toBe('1 2 2 3 3 3 3');
@@ -80,7 +80,7 @@ describe('Testing Binary Tree', () => {
 
     result = tree
       .levelOrderTraverse()
-      .map(x => x.calcLevel())
+      .map(x => x.getLevel())
       .join(' ');
 
     expect(result).toBe('1 2 2 3 3 3 3 4');

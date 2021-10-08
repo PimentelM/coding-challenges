@@ -19,6 +19,10 @@ export class BinaryNode {
     this.cache = {};
   }
 
+  hasParent() {
+    return !!this.parent
+  }
+
   hasNoChilds(): boolean {
     return !this.left && !this.right;
   }
@@ -77,15 +81,11 @@ export class BinaryNode {
     this.parent = node;
   }
 
-  calcValueFromData(f: (data: any) => number) {
-    return (this.value = f(this.data));
-  }
-
-  calcLevel(startingIndex: number = 1): number {
-    if (this.cache.level) return this.cache.level;
+  getLevel(startingIndex: number = 1, useCache: boolean = false): number {
+    if (useCache && this.cache.level) return this.cache.level;
     if (!this.parent) return startingIndex;
 
-    return (this.cache.level = this.parent.calcLevel() + 1);
+    return (this.cache.level = this.parent.getLevel() + 1);
   }
 
   inOrderTraverse(): BinaryNode[] {
@@ -168,29 +168,13 @@ export class BinaryNode {
   }
 
   executeForAllNodes(action: (node: BinaryNode) => any){
-    return this.executeForAllNodesInLevelOrder(action)
-  }
-
-  executeForAllNodesInLevelOrder(action: (node: BinaryNode) => any) {
     return this.levelOrderTraverse().map(action);
-  }
-
-  executeForAllNodesInOrder(action: (node: BinaryNode) => any) {
-    return this.inOrderTraverse().map(action);
-  }
-
-  executeForAllNodesPreOrder(action: (node: BinaryNode) => any) {
-    return this.preOrderTraverse().map(action);
-  }
-
-  executeForAllNodesPostOrder(action: (node: BinaryNode) => any) {
-    return this.postOrderTraverse().map(action);
   }
 
   print(prefix = '', isTail = false) {
     let nodeType = !this.parent ? `-` : this.parent.right === this ? `r` : `l`;
 
-    console.log(prefix + `|-${nodeType} ${this.value} {${this.calcLevel()}}`);
+    console.log(prefix + `|-${nodeType} ${this.value} {${this.getLevel()}}`);
 
     if (this.left) {
       this.left.print(prefix + (isTail ? '    ' : '|   '), !this.right);
