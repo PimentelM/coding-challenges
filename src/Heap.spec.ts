@@ -2,8 +2,8 @@ import {Heap} from "./Heap";
 import {BinaryNode} from "./BinaryNode";
 
 describe(`Testing Heap`, () => {
-    let heap;
-    let count;
+    let heap : Heap;
+    let count : number;
     let smallestElementAdded = Infinity;
     let biggestElementAdded = -Infinity;
     beforeEach(() => {
@@ -26,6 +26,10 @@ describe(`Testing Heap`, () => {
             });
     });
 
+    afterEach(() => {
+            expect(heap.isCorrect()).toBeTruthy()
+    })
+
     it('Root node parent should be undefined', () => {
         expect(heap.root.parent).toBe(undefined)
     })
@@ -36,7 +40,7 @@ describe(`Testing Heap`, () => {
 
     it('All parent nodes should be smaller than their children', () => {
 
-        let results = heap.root.executeForAllNodes(heap.isParentValueSmallerThanChildren)
+        let results = heap.root.executeForAllNodes(heap.isNodeValueSmallerThanChildren)
 
         expect(results.every(x=>x)).toBe(true);
 
@@ -47,7 +51,7 @@ describe(`Testing Heap`, () => {
 
         heap.switchType();
 
-        let results = heap.root.executeForAllNodes(heap.isParentValueGreaterThanChildren)
+        let results = heap.root.executeForAllNodes(heap.isNodeValueGreaterThanChildren)
 
         expect(results.every(x=>x)).toBe(true);
 
@@ -57,18 +61,51 @@ describe(`Testing Heap`, () => {
     it('Should have a peek method that doesnt change heap size', ()=>{
         let peek = heap.peek();
 
-        expect(peek).toBe(smallestElementAdded)
+        expect(peek.value).toBe(smallestElementAdded)
         expect(heap.root.nodeCount()).toBe(count)
     })
 
 
-    it('Should have a poll method that removes the element from the heap', ()=>{
+    it('Should have a poll method that removes the element from the min heap correctly', ()=>{
         expect(heap.root.nodeCount()).toBe(count)
 
         let poll = heap.poll();
 
-        expect(poll).toBe(smallestElementAdded)
+        expect(poll.value).toBe(smallestElementAdded)
         expect(heap.root.nodeCount()).toBe(count -1)
+
+        let lastValue = smallestElementAdded
+        while(heap.count() > 0){
+            let currentPoll = heap.poll()
+
+            expect(currentPoll.value >= lastValue).toBeTruthy()
+            lastValue = currentPoll.value
+
+        }
+
+
+    })
+
+    it('Should have a poll method that removes the element from the max heap correctly', ()=>{
+        expect(heap.root.nodeCount()).toBe(count)
+
+        heap.switchType()
+
+        let poll = heap.poll();
+
+        expect(poll.value).toBe(biggestElementAdded)
+        expect(heap.root.nodeCount()).toBe(count -1)
+
+        let lastValue = biggestElementAdded
+        while(heap.count() > 0){
+            let currentPoll = heap.poll()
+
+            expect(currentPoll.value <= lastValue).toBeTruthy()
+            lastValue = currentPoll.value
+
+        }
+
+
     })
 
 

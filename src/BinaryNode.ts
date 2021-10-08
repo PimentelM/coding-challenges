@@ -81,6 +81,14 @@ export class BinaryNode {
     this.parent = node;
   }
 
+  isBiggerThan(node: BinaryNode){
+    return this.value > node.value
+  }
+
+  isSmallerThan(node:BinaryNode){
+    return this.value < node.value
+  }
+
   // returns true when swap is executed successfully
   swapValuesWith(node: BinaryNode): boolean {
     if (!node) return false;

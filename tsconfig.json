@@ -15,8 +15,7 @@
     "challenges"
   ],
   "include": [
-    "data-structures",
-    "algorithms"
+    "src",
   ],
   "types": ["@types/jest"]
 
