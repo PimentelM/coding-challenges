@@ -1,12 +1,13 @@
-import {FastHeap} from "./FastHeap";
+import {Heap} from "./Heap.deprecated";
+import {BinaryNode} from "./BinaryNode";
 
-describe(`Testing FastHeap`, () => {
-    let heap : FastHeap;
+describe.skip(`Testing Heap`, () => {
+    let heap : Heap;
     let count : number;
     let smallestElementAdded = Infinity;
     let biggestElementAdded = -Infinity;
     beforeEach(() => {
-        heap = new FastHeap();
+        heap = new Heap();
         count = 0;
 
 
@@ -14,8 +15,7 @@ describe(`Testing FastHeap`, () => {
             .split(' ')
             .map(Number)
             .forEach(value => {
-                let data = `data for ${value}`
-                heap.addValue(value, data);
+                heap.addNode(value);
                 count++;
                 if(value < smallestElementAdded){
                     smallestElementAdded = value;
@@ -30,35 +30,28 @@ describe(`Testing FastHeap`, () => {
             expect(heap.isCorrect()).toBeTruthy()
     })
 
-    // TODO: Test binary tree operations as in BinaryNode.spec.ts
+    it('Root node parent should be undefined', () => {
+        expect(heap.root.parent).toBe(undefined)
+    })
 
     it('All nodes should be added successfully', () => {
-        expect(heap.treeSequence.length).toBe(count)
+        expect(heap.root.nodeCount()).toBe(count)
     })
 
     it('All parent nodes should be smaller than their children', () => {
 
-        let results = heap.levelOrderTraverse().map((i)=>heap.isNodeValueSmallerThanChildren(i))
+        let results = heap.root.executeForAllNodes(heap.isNodeValueSmallerThanChildren)
 
         expect(results.every(x=>x)).toBe(true);
 
 
     });
 
-    it('Should be able to poll with data', () => {
-        while(heap.count() > 0){
-            let { data, value } = heap.pollWithData()
-
-            expect(data).toBe(`data for ${value}`)
-        }
-
-    })
-
     it('If heap is switched to max heap, all parent nodes should be greater than their children', () => {
 
         heap.switchType();
 
-        let results = heap.levelOrderTraverse().map((i)=>heap.isNodeValueGreaterThanChildren(i))
+        let results = heap.root.executeForAllNodes(heap.isNodeValueGreaterThanChildren)
 
         expect(results.every(x=>x)).toBe(true);
 
@@ -68,25 +61,25 @@ describe(`Testing FastHeap`, () => {
     it('Should have a peek method that doesnt change heap size', ()=>{
         let peek = heap.peek();
 
-        expect(peek).toBe(smallestElementAdded)
-        expect(heap.count()).toBe(count)
+        expect(peek.value).toBe(smallestElementAdded)
+        expect(heap.root.nodeCount()).toBe(count)
     })
 
 
     it('Should have a poll method that removes the element from the min heap correctly', ()=>{
-        expect(heap.count()).toBe(count)
+        expect(heap.root.nodeCount()).toBe(count)
 
         let poll = heap.poll();
 
-        expect(poll).toBe(smallestElementAdded)
-        expect(heap.count()).toBe(count -1)
+        expect(poll.value).toBe(smallestElementAdded)
+        expect(heap.root.nodeCount()).toBe(count -1)
 
         let lastValue = smallestElementAdded
         while(heap.count() > 0){
             let currentPoll = heap.poll()
 
-            expect(currentPoll >= lastValue).toBeTruthy()
-            lastValue = currentPoll
+            expect(currentPoll.value >= lastValue).toBeTruthy()
+            lastValue = currentPoll.value
 
         }
 
@@ -94,25 +87,23 @@ describe(`Testing FastHeap`, () => {
     })
 
     it('Should have a poll method that removes the element from the max heap correctly', ()=>{
-        expect(heap.count()).toBe(count)
+        expect(heap.root.nodeCount()).toBe(count)
 
         heap.switchType()
 
-
         let poll = heap.poll();
 
-        expect(poll).toBe(biggestElementAdded)
-        expect(heap.count()).toBe(count -1)
+        expect(poll.value).toBe(biggestElementAdded)
+        expect(heap.root.nodeCount()).toBe(count -1)
 
         let lastValue = biggestElementAdded
         while(heap.count() > 0){
             let currentPoll = heap.poll()
 
-            expect(currentPoll <= lastValue).toBeTruthy()
-            lastValue = currentPoll
+            expect(currentPoll.value <= lastValue).toBeTruthy()
+            lastValue = currentPoll.value
 
         }
-
 
 
     })

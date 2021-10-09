@@ -24,29 +24,117 @@ function readLine() {
     return inputString[currentLine++];
 }
 
-function findDistances(startingNode, edges, numberOfNodes){
-    console.log(`Starting node: ${startingNode}`)
+
+class GraphNode {
+    value;
+    data;
+    adjacencyTable = {} // { [id]: { node, weight } }
+    isDirected = false;
+
+    constructor(value, data = {}) {
+
+        this.value = value;
+        this.data = data;
+    }
+
+    addAdjacent(node, weight){
+        if(this.isAdjacent(node.value)) return;
+
+        this.adjacencyTable[node.value] = {node, weight}
+
+        if(!this.isDirected){
+            node.addAdjacent(this,weight)
+        }
+    }
+
+    getAdjacents(){
+        return Object.values(this.adjacencyTable)
+    }
+
+    isAdjacent(nodeValue){
+        return !!this.adjacencyTable[nodeValue]
+    }
+
+    findPathTo(destinationId, visited = {[this.value] : true}){
+        let checkQueue = []
+
+        if(this.isAdjacent(destinationId)){
+            return [this.adjacencyTable[destinationId]]
+        }
+
+        // Add all nodes that can be visited to the check queue
+        for(let {node: adjacentNode} of this.getAdjacents()){
+            // Check if already visited this node
+            if(visited[adjacentNode.value]){
+                continue
+            }
+
+            // Mark the node as visited
+            visited[adjacentNode.value] = true
+
+            checkQueue.push(adjacentNode)
+        }
+
+
+        while(checkQueue[0]){
+            let next = checkQueue.shift()
+
+            let path = next.findPathTo(destinationId,visited)
+            let weightToNext = this.adjacencyTable[next.value].weight
+            if(path){
+                return [{node: this, weight: weightToNext},...path]
+            }
+        }
+
+        return undefined
+
+    }
+
+}
+
+function findDistances(s, edges, numberOfNodes){
+    console.log(`Starting node: ${s}`)
     console.log(`Edges:`, JSON.stringify(edges))
     console.log(`Number of nodes: ${numberOfNodes}`)
 
-    let graph = {}
+    let weight = 6
 
+    // Our result
     let distances = new Array(numberOfNodes).fill(-1)
 
-    let i = 0
-    while(i<numberOfNodes){
-        graph[i] = []
+    // Translate from node ID to node object
+    let nodeTable = {}
+
+    // Initialize all Nodes
+    for (let i = 1; i <= numberOfNodes; i++){
+        nodeTable[i] = new GraphNode(i.toString())
     }
 
-    for(let edge of edges){
-        graph[edge[0]].push(edge[1])
-        graph[edge[1]].push(edge[0])
+    // Add edges
+    for (let [from,to] of edges){
+        let nodeFrom = nodeTable[from]
+        let nodeTo = nodeTable[to]
+
+        nodeFrom.addAdjacent(nodeTo,weight)
     }
 
 
+    let startingNode = nodeTable[s]
 
 
-    return []
+
+    // Ok, now we need to find the distance to all nodes from 1 to n
+
+    // nodes that destination was found
+
+    for(let i = 2; i <= numberOfNodes; i++){
+        let path = startingNode.findPathTo(i)
+        if(path){
+            distances[i -1] = (path.length) * weight
+        }
+    }
+
+    return distances
 }
 
 function parse(){

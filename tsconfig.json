@@ -12,7 +12,8 @@
     "node_modules",
     "js",
     "**/*.spec.ts",
-    "challenges"
+    "challenges",
+    "**/*.deprecated.ts",
   ],
   "include": [
     "src",

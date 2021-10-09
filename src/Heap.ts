@@ -1,138 +1,50 @@
-import {BinaryNode} from "./BinaryNode";
-
 // Data structure written by Mateus Pimentel
 export class Heap {
-    root: BinaryNode;
-    nodeList : BinaryNode[] = [];
+    treeSequence: number[] = [];
+    dataForIndex: any[] = [];
     type: "min" | "max";
+
     constructor(type: "min" | "max" = "min") {
         this.type = type;
     }
 
     // This operation is the same for max and min heap
-    addNode(value: number, data: any = {}, parent: BinaryNode = this.root): void {
-        // If root is not present, then add element as root.
-        if (!this.root) {
-            this.root = parent = new BinaryNode(value, data);
-            return;
-        }
-
-        let nodes = [this.root]
-
-        // If root is present, do a level search looking for the first node with an empty slot from left to right.
-
-        let addedNode;
-        while (nodes.length > 0) {
-            let node = nodes.shift();
-
-            if (node.hasLeftChild()) {
-                nodes.push(node.left);
-            } else {
-                addedNode = node.addLeftNode(value, data)
-                break;
-            }
-
-            if (node.hasRightChild()) {
-                nodes.push(node.right);
-            } else {
-                addedNode = node.addRightNode(value, data)
-                break;
-            }
-
-        }
+    addValue(value: number, data: any = undefined): void {
+        this.treeSequence.push(value);
+        this.dataForIndex.push(data);
 
         // Once the node is added, we need to bubble it up
-        this.bubbleUpNode(addedNode);
-
-        // Reference to the node slot, not the node + value ( since it may be bubbled up )
-        // So we can have a structure like a sequential binary tree with the advantages of node abstraction
-        this.nodeList.push(addedNode)
+        this.bubbleUpNode(this.treeSequence.length - 1);
     }
 
-    public count(){
-        return this.nodeList.length
-    }
-
-    public isCorrect() : boolean{
-
-        if(this.count() === 0 && this.root === undefined) return true
-
-
-        let check = this.type === "min" ? this.isNodeValueSmallerThanChildren : this.isNodeValueGreaterThanChildren
-
-        return this.root.executeForAllNodes(check).every(x=>x)
-
-    }
-
-    public peek() : {value: number, data: any} {
-        return {
-            value: this.root.value,
-            data: this.root.data
-        }
-    }
-
-
-
-
-    public poll() : {value: number, data: any} {
-        let lastNodeInTheTree = this.nodeList.pop()
-        let { value, data } = this.root
-
-        if(this.root === lastNodeInTheTree){
-            this.root = undefined
-            return {
-                value,data
-            }
-        }
-
-
-        // Make root have the same value as the last added node
-        this.root.swapValuesWith(lastNodeInTheTree)
-
-        // Remove any references to the last node in his parent
-        if(lastNodeInTheTree.parent.left === lastNodeInTheTree){
-            lastNodeInTheTree.parent.left = undefined;
-        } else if (lastNodeInTheTree.parent.right === lastNodeInTheTree) {
-            lastNodeInTheTree.parent.right = undefined;
-        }
-
-        // Sift down the now root node
-        this.siftDownNode(this.root)
-
-        return {
-            value,
-            data
-        }
-    }
-
-    public switchType() {
-        this.type = this.type === "min" ? "max" : "min";
-        this.heapfy()
-    }
-
-    private siftDownNode(node: BinaryNode){
+    private siftDownNode(nodeIndex: number) {
         // Switch node positions with it's left child while it's value is:
         // Lesser than it's child when doing a MAX heap
         // Greater than it's child when doing a MIN heap
 
-        if(!node.hasLeftChild()) return false
+        if (!this.hasLeft(nodeIndex)) return false
 
         let hasSiftedDown = false;
 
-        while(node.hasAnyChild()){
-            let childNode = node.left
+        while (this.hasLeft(nodeIndex)) {
+            let childIndex = this.getLeftIndex(nodeIndex)
 
-            if(node.right){
-                let chooseRightChild = this.type === "min" ? node.right.isSmallerThan(node.left) : node.right.isBiggerThan(node.left)
-                if(chooseRightChild){
-                    childNode = node.right
+            if (this.hasRight(nodeIndex)) {
+                let doChooseRightChild = this.type === "min" ?
+                    this.getRightValue(nodeIndex) < this.getLeftValue(nodeIndex)
+                    : this.getRightValue(nodeIndex) > this.getLeftValue(nodeIndex)
+                if (doChooseRightChild) {
+                    childIndex = this.getRightIndex(nodeIndex)
                 }
             }
 
-            let shouldSift = this.type === "min" ? childNode.isSmallerThan(node) :childNode.isBiggerThan(node)
-            if (shouldSift){
-                if (node.swapValuesWith(childNode)) {
-                    node = childNode;
+            let shouldSift = this.type === "min" ?
+                this.getNodeValue(childIndex) < this.getNodeValue(nodeIndex)
+                : this.getNodeValue(childIndex) > this.getNodeValue(nodeIndex)
+
+            if (shouldSift) {
+                if (this.swapValues(nodeIndex, childIndex)) {
+                    nodeIndex = childIndex;
                     hasSiftedDown = true;
                 }
             } else {
@@ -145,21 +57,34 @@ export class Heap {
     }
 
 
-    private bubbleUpNode(node: BinaryNode) {
+    private bubbleUpNode(nodeIndex: number) {
         // Switch node positions with it's parent while it's value is:
         // Lesser than it's parent when doing a MIN heap
         // Greater than it's parent when doing a MAX heap
 
-        if (!node.parent) return false;
+        if (!this.hasParent(nodeIndex)) return false;
 
         let hasBubbled = false;
-        let hasToBubble = this.type === "min" ? this.isNodeValueSmallerThanParent : this.isNodeValueGreaterThanParent
+        let hasToBubble = (i : number) => {
+            // If has no parent, then no need to bubble.
+            if(!this.hasParent(i)) return false;
 
-        while (hasToBubble(node)) {
-            if(!node.parent) break;
-            if (node.swapValuesWith(node.parent)) {
-                node = node.parent;
+            return this.type === "min" ?
+                // Has to bubble if parent value is bigger than node value
+                this.getParentValue(i) > this.getNodeValue(i) :
+                // Has to bubble if parent value is smaller than node value
+                this.getParentValue(i) < this.getNodeValue(i)
+        }
+
+
+
+        while (hasToBubble(nodeIndex)) {
+            let parentIndex = this.getParentIndex(nodeIndex)
+            if (this.swapValues(nodeIndex, parentIndex)) {
+                nodeIndex = parentIndex
                 hasBubbled = true;
+            } else {
+                break;
             }
         }
 
@@ -168,67 +93,381 @@ export class Heap {
     }
 
     private heapfy() {
-        let didBuble = this.root
-            .postOrderTraverse()
-            .map(node => this.bubbleUpNode(node))
-            .reduce((a, x) => a || x)
 
-        if (didBuble) {
-            this.heapfy()
+        let tree = this.treeSequence
+        let data = this.dataForIndex
+
+        this.treeSequence = []
+        this.dataForIndex = []
+
+        let i = 0;
+        tree.forEach(value => {
+            this.addValue(value, data[i])
+            i++;
+        })
+
+
+    }
+
+
+    public peek(): number {
+
+        return this.treeSequence[0]
+    }
+
+    public pollWithData(): { value: number, data: number } {
+
+        if (this.treeSequence.length === 0) throw new Error("Can't poll from empty heap")
+
+        let lastValue = this.treeSequence.pop()
+        let lastData = this.dataForIndex.pop()
+
+        if (this.treeSequence.length === 0)
+            return {
+                value: lastValue,
+                data: lastData
+            }
+
+
+        let returnValue = this.treeSequence[0]
+        let returnData = this.dataForIndex[0]
+
+        this.treeSequence[0] = lastValue
+        this.dataForIndex[0] = lastData
+
+        // Sift down the now root node
+        this.siftDownNode(0)
+
+
+        return {
+            value: returnValue,
+            data: returnData
         }
     }
 
-    getSortedElements(){
-        return this.root.levelOrderTraverse().sort((a,b)=>a.value - b.value)
+    public peekWithData(): { value: number, data: number } {
+        return {
+            value: this.treeSequence[0],
+            data: this.dataForIndex[0]
+        }
     }
 
-    isNodeValueSmallerThanChildren(node: BinaryNode): boolean {
-        // Note we are not taking in consideration a false return for cases
-        // when the node and parent value are the same.
+    public poll(getData = false): number {
 
-        if (node.hasLeftChild()) {
-            if (node.value > node.left.value) return false
-        }
+        if (this.treeSequence.length === 0) throw new Error("Can't poll from empty heap")
 
-        if (node.hasRightChild()) {
-            if (node.value > node.right.value) return false
-        }
+        let lastValue = this.treeSequence.pop()
+        let lastData = this.dataForIndex.pop()
+
+        if (this.treeSequence.length === 0)
+            return lastValue
+
+
+        let returnValue = this.treeSequence[0]
+
+        this.treeSequence[0] = lastValue
+        this.dataForIndex[0] = lastData
+
+        // Sift down the now root node
+        this.siftDownNode(0)
+
+
+        return returnValue;
+    }
+
+    // Tree sequence operations
+    hasLeft(i: number) {
+        return this.getLeftValue(i) !== undefined
+    }
+
+    hasRight(i: number) {
+        return this.getRightValue(i) !== undefined
+    }
+
+    hasParent(i: number) {
+        return this.getParentValue(i) !== undefined
+    }
+
+    hasNoChilds(i: number): boolean {
+        return !this.hasLeft(i) && !this.hasRight(i);
+    }
+
+    hasBothChilds(i: number): boolean {
+        return !!this.hasLeft(i) && !!this.hasRight(i);
+    }
+
+    hasOneChild(i: number): boolean {
+        return this.hasAnyChild(i) && !this.hasBothChilds(i);
+    }
+
+    hasAnyChild(i: number): boolean {
+        return !!this.hasLeft(i) || !!this.hasLeft(i);
+    }
+
+    getLeftValue(i: number) {
+        return this.treeSequence[this.getLeftIndex(i)]
+    }
+
+    getRightValue(i: number) {
+        return this.treeSequence[this.getRightIndex(i)]
+    }
+
+    getParentValue(i: number) {
+        return this.treeSequence[this.getParentIndex(i)]
+    }
+
+    getLeftIndex(i: number) {
+        return i * 2 + 1
+    }
+
+    getRightIndex(i: number) {
+        return i * 2 + 2
+    }
+
+    getParentIndex(i: number) {
+        return Math.floor((i - 1) / 2)
+    }
+
+    getNodeValue(i: number) {
+        return this.treeSequence[i]
+    }
+
+    getNodeData(i: number) {
+        return this.dataForIndex[i]
+    }
+
+    setNodeValue(i: number, value: number) {
+        this.treeSequence[i] = value
+    }
+
+    setNodeData(i: number, data: any) {
+        this.dataForIndex[i] = data
+    }
+
+    setLeftChildValue(i: number, value: number) {
+        this.setNodeValue(this.getLeftIndex(i), value)
+    }
+
+    setRightChildValue(i: number, value: number) {
+        this.setNodeValue(this.getRightIndex(i), value)
+    }
+
+    swapValues(nodeAIndex: number, nodeBIndex: number) {
+        let a = this.getNodeValue(nodeAIndex)
+        let b = this.getNodeValue(nodeBIndex)
+
+        let dataA = this.getNodeData(nodeAIndex)
+        let dataB = this.getNodeData(nodeBIndex)
+
+        if (a === undefined || b === undefined)
+            return false
+
+        this.setNodeValue(nodeAIndex, b)
+        this.setNodeValue(nodeBIndex, a)
+
+        this.setNodeData(nodeAIndex, dataB)
+        this.setNodeData(nodeBIndex, dataA)
 
         return true
     }
 
-    isNodeValueGreaterThanChildren(node: BinaryNode): boolean {
-        if (node.hasLeftChild()) {
-            if (node.value < node.left.value) return false
-        }
+    // Value comparassions
 
-        if (node.hasRightChild()) {
-            if (node.value < node.right.value) return false
-        }
-
-        return true
-    }
-
-    isNodeValueSmallerThanParent(node: BinaryNode): boolean {
+    isNodeValueSmallerThanOrEqualToChildren(nodeIndex: number): boolean {
         // Note we are not taking in consideration a false return for cases
         // when the node and parent value are the same.
 
-        if (!node.parent) {
-            return false
+        if (this.hasLeft(nodeIndex)) {
+            if (this.getNodeValue(nodeIndex) > this.getLeftValue(nodeIndex)) return false
         }
 
-        return node.value < node.parent.value
+        if (this.hasRight(nodeIndex)) {
+            if (this.getNodeValue(nodeIndex) > this.getRightValue(nodeIndex)) return false
+        }
+
+        return this.hasAnyChild(nodeIndex);
+
+
+
+
     }
 
-    isNodeValueGreaterThanParent(node: BinaryNode): boolean {
+    isNodeValueGreaterThanOrEqualToChildren(nodeIndex: number): boolean {
         // Note we are not taking in consideration a false return for cases
         // when the node and parent value are the same.
 
-        if (!node.parent) {
+        if (this.hasLeft(nodeIndex)) {
+            if (this.getNodeValue(nodeIndex) < this.getLeftValue(nodeIndex)) return false
+        }
+
+        if (this.hasRight(nodeIndex)) {
+            if (this.getNodeValue(nodeIndex) < this.getRightValue(nodeIndex)) return false
+        }
+
+        return this.hasAnyChild(nodeIndex);
+    }
+
+    isNodeValueSmallerThanParent(nodeIndex: number): boolean {
+        // Note we are not taking in consideration a false return for cases
+        // when the node and parent value are the same.
+
+        if (!this.hasParent(nodeIndex)) {
             return false
         }
 
-        return node.value > node.parent.value
+        return this.getNodeValue(nodeIndex) < this.getParentValue(nodeIndex)
     }
+
+    isNodeValueGreaterThanParent(nodeIndex: number): boolean {
+        // Note we are not taking in consideration a false return for cases
+        // when the node and parent value are the same.
+
+        if (!this.hasParent(nodeIndex)) {
+            return false
+        }
+
+        return this.getNodeValue(nodeIndex) > this.getParentValue(nodeIndex)
+    }
+
+    isNodeValueSmallerThanOrEqualToParent(nodeIndex: number): boolean {
+        // Note we are not taking in consideration a false return for cases
+        // when the node and parent value are the same.
+
+        if (!this.hasParent(nodeIndex)) {
+            return false
+        }
+
+        return this.getNodeValue(nodeIndex) <= this.getParentValue(nodeIndex)
+    }
+
+    isNodeValueGreaterThanOrEqualToParent(nodeIndex: number): boolean {
+        // Note we are not taking in consideration a false return for cases
+        // when the node and parent value are the same.
+
+        if (!this.hasParent(nodeIndex)) {
+            return false
+        }
+
+        return this.getNodeValue(nodeIndex) >= this.getParentValue(nodeIndex)
+    }
+
+
+
+
+    // Traverses
+
+    inOrderTraverse(nodeIndex = 0): number[] {
+        let result = [];
+
+        if (this.hasLeft(nodeIndex)) {
+            result.push(...this.inOrderTraverse(this.getLeftIndex(nodeIndex)))
+        }
+
+        result.push(nodeIndex)
+
+        if (this.hasRight(nodeIndex)) {
+            result.push(...this.inOrderTraverse(this.getRightIndex(nodeIndex)))
+        }
+
+
+        return result
+    }
+
+    postOrderTraverse(nodeIndex = 0): number[] {
+        let result = [];
+
+        if (this.hasLeft(nodeIndex)) {
+            result.push(...this.postOrderTraverse(this.getLeftIndex(nodeIndex)))
+        }
+
+        if (this.hasRight(nodeIndex)) {
+            result.push(...this.postOrderTraverse(this.getRightIndex(nodeIndex)))
+        }
+
+        result.push(nodeIndex)
+
+        return result
+    }
+
+    levelOrderTraverse(): number[] {
+        let result = [];
+
+        let traverseQueue: number[] = [];
+
+        let currentIndex: number = 0;
+
+        while (currentIndex) {
+            result.push(currentIndex)
+            if (this.hasLeft(currentIndex)) traverseQueue.push(this.getLeftIndex(currentIndex));
+            if (this.hasRight(currentIndex)) traverseQueue.push(this.getRightIndex(currentIndex));
+
+            currentIndex = traverseQueue.shift();
+        }
+
+        return result;
+    }
+
+
+    // Test utils
+
+    public count() {
+        return this.treeSequence.length
+    }
+
+    public isCorrect(): boolean {
+
+        if (this.count() === 0) return true
+
+
+        // min: Node value should be smaller or equal to children's value
+        // max: Node value should be bigger or equal to children's value
+
+        // min: Node value should be bigger or equal to paren'ts value
+        // max: Node value should be smaller or equal to parent's value
+        let check = (i: number) => {
+
+            if(this.type === "min"){
+                if(this.hasAnyChild(i)){
+                    if(!this.isNodeValueSmallerThanOrEqualToChildren(i))
+                        return false
+                }
+
+                if(this.hasParent(i)){
+                    if(!this.isNodeValueGreaterThanOrEqualToParent(i))
+                        return false
+                }
+            } else {
+                if(this.hasAnyChild(i)){
+                    if(!this.isNodeValueGreaterThanOrEqualToChildren(i))
+                        return false
+                }
+
+                if(this.hasParent(i)){
+                    if(!this.isNodeValueSmallerThanOrEqualToParent(i))
+                        return false
+                }
+            }
+
+            return true
+        }
+
+
+        let i = 0;
+
+        while(i<this.count()){
+            if(!check(i))
+                return false;
+            i++
+        }
+
+
+        return true;
+    }
+
+    public switchType() {
+        this.type = this.type === "min" ? "max" : "min";
+        this.heapfy()
+    }
+
 
 }

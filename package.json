@@ -7,8 +7,8 @@
     "test": "jest",
     "prepare": "husky install",
     "lintAndCheck": "npx tsc --noEmit && npx lint-staged",
-    "start" : "npx ts-node ./index.ts",
-    "build" : "bash.exe pre-compile-script.sh && npx tsc && bash.exe post-compile-script.sh"
+    "start": "npx ts-node ./index.ts",
+    "build": "bash.exe pre-compile-script.sh && npx tsc && bash.exe post-compile-script.sh"
   },
   "keywords": [],
   "author": "",
@@ -24,6 +24,7 @@
     "prettier": "^2.4.1",
     "ts-jest": "^27.0.5",
     "ts-node": "^10.2.1",
+    "ts-to-jsdoc": "^1.1.0",
     "typescript": "^4.4.3"
   }
 }
