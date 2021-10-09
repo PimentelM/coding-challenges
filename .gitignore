@@ -122,3 +122,5 @@ dist
 
 .idea/
 /src/DataStructures.ts
+
+index.js

@@ -29,6 +29,7 @@ describe(`Testing Heap`, () => {
             expect(heap.isCorrect()).toBeTruthy()
     })
 
+    // TODO: Test binary tree operations as in BinaryNode.spec.ts
 
     it('All nodes should be added successfully', () => {
         expect(heap.treeSequence.length).toBe(count)
