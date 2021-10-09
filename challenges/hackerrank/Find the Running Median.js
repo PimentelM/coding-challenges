@@ -26,8 +26,8 @@ function readLine() {
 
 class MedianHeap{
 
-    leftHeap = new Heap("max")
-    rightHeap = new Heap("min")
+    leftHeap = new FastHeap("max")
+    rightHeap = new FastHeap("min")
 
     count = 0
 
@@ -37,7 +37,7 @@ class MedianHeap{
         if(this.count === 0) throw new Error("Has no values yet")
 
         if(this.virtualMedian === undefined) {
-            return ( (this.leftHeap.peek().value + this.rightHeap.peek().value) / 2)
+            return ( (this.leftHeap.peek() + this.rightHeap.peek()) / 2)
         } else return this.virtualMedian
     }
 
@@ -51,11 +51,11 @@ class MedianHeap{
 
         if(this.count % 2 === 1){
             if(number > this.virtualMedian){
-                this.rightHeap.addNode(number)
-                this.leftHeap.addNode(this.virtualMedian)
+                this.rightHeap.addValue(number)
+                this.leftHeap.addValue(this.virtualMedian)
             } else {
-                this.leftHeap.addNode(number)
-                this.rightHeap.addNode(this.virtualMedian)
+                this.leftHeap.addValue(number)
+                this.rightHeap.addValue(this.virtualMedian)
             }
 
             this.virtualMedian = undefined
@@ -65,11 +65,11 @@ class MedianHeap{
             let newVirtualMedian;
 
             if(number > this.getMedian()){
-                this.rightHeap.addNode(number)
-                newVirtualMedian = this.rightHeap.poll().value
+                this.rightHeap.addValue(number)
+                newVirtualMedian = this.rightHeap.poll()
             } else if (number < this.getMedian()){
-                this.leftHeap.addNode(number)
-                newVirtualMedian = this.leftHeap.poll().value
+                this.leftHeap.addValue(number)
+                newVirtualMedian = this.leftHeap.poll()
             } else {
                 newVirtualMedian = number
             }
@@ -125,355 +125,304 @@ function main() {
     ws.end();
 }
 
-
 // Data structure written by Mateus Pimentel
-class BinaryNode {
-    constructor(value, data, parent = undefined) {
-        this.cache = {};
-        this.parent = parent;
-        this.value = value;
-        this.data = data;
-    }
-    resetCache() {
-        this.cache = {};
-    }
-    hasParent() {
-        return !!this.parent;
-    }
-    hasNoChilds() {
-        return !this.left && !this.right;
-    }
-    hasBothChilds() {
-        return !!this.left && !!this.right;
-    }
-    hasOneChild() {
-        return this.hasAnyChild() && !this.hasBothChilds();
-    }
-    hasAnyChild() {
-        return !!this.left || !!this.right;
-    }
-    hasLeftChild() {
-        return !!this.left;
-    }
-    hasRightChild() {
-        return !!this.right;
-    }
-    setLeftChild(node) {
-        this.left = node;
-        if (node)
-            node.setParent(this);
-    }
-    setRightChild(node) {
-        this.right = node;
-        if (node)
-            node.setParent(this);
-    }
-    addRightNode(value, data = undefined) {
-        if (this.right)
-            throw new Error('Node already exists');
-        return (this.right = new BinaryNode(value, data, this));
-    }
-    addLeftNode(value, data = undefined) {
-        if (this.left)
-            throw new Error('Node already exists');
-        return (this.left = new BinaryNode(value, data, this));
-    }
-    setValue(value) {
-        this.value = value;
-    }
-    setData(data) {
-        this.data = data;
-    }
-    setParent(node) {
-        this.parent = node;
-    }
-    isBiggerThan(node) {
-        return this.value > node.value;
-    }
-    isSmallerThan(node) {
-        return this.value < node.value;
-    }
-    // returns true when swap is executed successfully
-    swapValuesWith(node) {
-        if (!node)
-            return false;
-        let thisValue = this.value;
-        let thisData = this.data;
-        let nodeData = node.data;
-        let nodeValue = node.value;
-        this.value = nodeValue;
-        this.data = nodeData;
-        this.resetCache();
-        node.value = thisValue;
-        node.data = thisData;
-        node.resetCache();
-        return true;
-    }
-    getLevel(startingIndex = 1, useCache = false) {
-        if (useCache && this.cache.level)
-            return this.cache.level;
-        if (!this.parent)
-            return startingIndex;
-        return (this.cache.level = this.parent.getLevel() + 1);
-    }
-    inOrderTraverse() {
-        let result = [];
-        // Traverse left node
-        if (this.left) {
-            result.push(...this.left.inOrderTraverse());
-        }
-        // Adds current value
-        result.push(this);
-        // Traverse Right Node
-        if (this.right) {
-            result.push(...this.right.inOrderTraverse());
-        }
-        return result;
-    }
-    preOrderTraverse() {
-        let result = [];
-        // Adds current value
-        result.push(this);
-        // Traverse left node
-        if (this.left) {
-            result.push(...this.left.preOrderTraverse());
-        }
-        // Traverse Right Node
-        if (this.right) {
-            result.push(...this.right.preOrderTraverse());
-        }
-        return result;
-    }
-    postOrderTraverse() {
-        let result = [];
-        // Traverse left node
-        if (this.left) {
-            result.push(...this.left.postOrderTraverse());
-        }
-        // Traverse Right Node
-        if (this.right) {
-            result.push(...this.right.postOrderTraverse());
-        }
-        // Adds current value
-        result.push(this);
-        return result;
-    }
-    levelOrderTraverse() {
-        let result = [];
-        let traverseQueue = [];
-        let current = this;
-        while (current) {
-            result.push(current);
-            if (current.left)
-                traverseQueue.push(current.left);
-            if (current.right)
-                traverseQueue.push(current.right);
-            current = traverseQueue.shift();
-        }
-        return result;
-    }
-    nodeCount() {
-        return this.inOrderTraverse().length;
-    }
-    executeForAllNodes(action) {
-        return this.levelOrderTraverse().map(action);
-    }
-    print(prefix = '', isTail = false) {
-        let nodeType = !this.parent ? `-` : this.parent.right === this ? `r` : `l`;
-        console.log(prefix + `|-${nodeType} ${this.value} {${this.getLevel()}}`);
-        if (this.left) {
-            this.left.print(prefix + (isTail ? '    ' : '|   '), !this.right);
-        }
-        if (this.right) {
-            this.right.print(prefix + (isTail ? '    ' : '|   '), true);
-        }
-        // If it's root
-        if (!this.parent)
-            console.log(this.inOrderTraverse()
-                .map(x => x.value)
-                .join(' '));
-    }
-}
-
-// Data structure written by Mateus Pimentel
-class Heap {
+class FastHeap {
     constructor(type = "min") {
-        this.nodeList = [];
+        this.treeSequence = [];
+        this.dataForIndex = [];
         this.type = type;
     }
+
     // This operation is the same for max and min heap
-    addNode(value, data = {}, parent = this.root) {
-        // If root is not present, then add element as root.
-        if (!this.root) {
-            this.root = parent = new BinaryNode(value, data);
-            return;
-        }
-        let nodes = [this.root];
-        // If root is present, do a level search looking for the first node with an empty slot from left to right.
-        let addedNode;
-        while (nodes.length > 0) {
-            let node = nodes.shift();
-            if (node.hasLeftChild()) {
-                nodes.push(node.left);
-            }
-            else {
-                addedNode = node.addLeftNode(value, data);
-                break;
-            }
-            if (node.hasRightChild()) {
-                nodes.push(node.right);
-            }
-            else {
-                addedNode = node.addRightNode(value, data);
-                break;
-            }
-        }
+    addValue(value, data = undefined) {
+        this.treeSequence.push(value);
+        this.dataForIndex.push(value);
         // Once the node is added, we need to bubble it up
-        this.bubbleUpNode(addedNode);
-        // Reference to the node slot, not the node + value ( since it may be bubbled up )
-        // So we can have a structure like a sequential binary tree with the advantages of node abstraction
-        this.nodeList.push(addedNode);
+        this.bubbleUpNode(this.treeSequence.length - 1);
     }
-    count() {
-        return this.nodeList.length;
-    }
-    isCorrect() {
-        if (this.count() === 0 && this.root === undefined)
-            return true;
-        let check = this.type === "min" ? this.isNodeValueSmallerThanChildren : this.isNodeValueGreaterThanChildren;
-        return this.root.executeForAllNodes(check).every(x => x);
-    }
-    peek() {
-        return {
-            value: this.root.value,
-            data: this.root.data
-        };
-    }
-    poll() {
-        let lastNodeInTheTree = this.nodeList.pop();
-        let { value, data } = this.root;
-        if (this.root === lastNodeInTheTree) {
-            this.root = undefined;
-            return {
-                value, data
-            };
-        }
-        // Make root have the same value as the last added node
-        this.root.swapValuesWith(lastNodeInTheTree);
-        // Remove any references to the last node in his parent
-        if (lastNodeInTheTree.parent.left === lastNodeInTheTree) {
-            lastNodeInTheTree.parent.left = undefined;
-        }
-        else if (lastNodeInTheTree.parent.right === lastNodeInTheTree) {
-            lastNodeInTheTree.parent.right = undefined;
-        }
-        // Sift down the now root node
-        this.siftDownNode(this.root);
-        return {
-            value,
-            data
-        };
-    }
-    switchType() {
-        this.type = this.type === "min" ? "max" : "min";
-        this.heapfy();
-    }
-    siftDownNode(node) {
+
+    // TODO: Should check if return value is correct
+    siftDownNode(nodeIndex) {
         // Switch node positions with it's left child while it's value is:
         // Lesser than it's child when doing a MAX heap
         // Greater than it's child when doing a MIN heap
-        if (!node.hasLeftChild())
+        if (!this.hasLeft(nodeIndex))
             return false;
         let hasSiftedDown = false;
-        while (node.hasAnyChild()) {
-            let childNode = node.left;
-            if (node.right) {
-                let chooseRightChild = this.type === "min" ? node.right.isSmallerThan(node.left) : node.right.isBiggerThan(node.left);
-                if (chooseRightChild) {
-                    childNode = node.right;
+        while (this.hasLeft(nodeIndex)) {
+            let childIndex = this.getLeftIndex(nodeIndex);
+            if (this.hasRight(nodeIndex)) {
+                let doChooseRightChild = this.type === "min" ?
+                    this.getRightValue(nodeIndex) < this.getLeftValue(nodeIndex)
+                    : this.getRightValue(nodeIndex) > this.getLeftValue(nodeIndex);
+                if (doChooseRightChild) {
+                    childIndex = this.getRightIndex(nodeIndex);
                 }
             }
-            let shouldSift = this.type === "min" ? childNode.isSmallerThan(node) : childNode.isBiggerThan(node);
+            let shouldSift = this.type === "min" ?
+                this.getNodeValue(childIndex) < this.getNodeValue(nodeIndex)
+                : this.getNodeValue(childIndex) > this.getNodeValue(nodeIndex);
             if (shouldSift) {
-                if (node.swapValuesWith(childNode)) {
-                    node = childNode;
+                if (this.swapValues(nodeIndex, childIndex)) {
+                    nodeIndex = childIndex;
                     hasSiftedDown = true;
                 }
-            }
-            else {
+            } else {
                 break;
             }
         }
         return hasSiftedDown;
     }
-    bubbleUpNode(node) {
+
+    // TODO: Should check if return value is correct
+    bubbleUpNode(nodeIndex) {
         // Switch node positions with it's parent while it's value is:
         // Lesser than it's parent when doing a MIN heap
         // Greater than it's parent when doing a MAX heap
-        if (!node.parent)
+        if (!this.hasParent(nodeIndex))
             return false;
         let hasBubbled = false;
-        let hasToBubble = this.type === "min" ? this.isNodeValueSmallerThanParent : this.isNodeValueGreaterThanParent;
-        while (hasToBubble(node)) {
-            if (!node.parent)
+        let hasToBubble = this.type === "min" ? (i) => this.isNodeValueSmallerThanParent(i) : (i) => this.isNodeValueGreaterThanParent(i);
+        while (hasToBubble(nodeIndex)) {
+            if (!this.hasParent(nodeIndex))
                 break;
-            if (node.swapValuesWith(node.parent)) {
-                node = node.parent;
+            let parentIndex = this.getParentIndex(nodeIndex);
+            if (this.swapValues(nodeIndex, parentIndex)) {
+                nodeIndex = parentIndex;
                 hasBubbled = true;
+            } else {
+                break;
             }
         }
         return hasBubbled;
     }
+
     heapfy() {
-        let didBuble = this.root
-            .postOrderTraverse()
-            .map(node => this.bubbleUpNode(node))
-            .reduce((a, x) => a || x);
-        if (didBuble) {
-            this.heapfy();
+        let tree = this.treeSequence;
+        let data = this.dataForIndex;
+        this.treeSequence = [];
+        this.dataForIndex = [];
+        let i = 0;
+        tree.forEach(value => {
+            i++;
+            this.addValue(value, data[i]);
+        });
+    }
+
+    peek(getData = false) {
+        if (getData) {
+            return {
+                value: this.treeSequence[0],
+                data: this.dataForIndex[0]
+            };
         }
+        return this.treeSequence[0];
     }
-    getSortedElements() {
-        return this.root.levelOrderTraverse().sort((a, b) => a.value - b.value);
+
+    poll(getData = false) {
+        if (this.treeSequence.length === 0)
+            throw new Error("Can't poll from empty heap");
+        let lastValue = this.treeSequence.pop();
+        let lastData = this.dataForIndex.pop();
+        if (this.treeSequence.length === 0)
+            if (getData) {
+                return {
+                    value: lastValue,
+                    data: lastData
+                };
+            } else
+                return lastValue;
+        let returnValue = this.treeSequence[0];
+        let returnData = this.dataForIndex[0];
+        this.treeSequence[0] = lastValue;
+        this.dataForIndex[0] = lastData;
+        // Sift down the now root node
+        this.siftDownNode(0);
+        if (getData) {
+            return {
+                value: returnValue,
+                data: returnData
+            };
+        } else
+            return returnValue;
     }
-    isNodeValueSmallerThanChildren(node) {
+
+    // Tree sequence operations
+    hasLeft(i) {
+        return this.getLeftValue(i) !== undefined;
+    }
+
+    hasRight(i) {
+        return this.getRightValue(i) !== undefined;
+    }
+
+    hasParent(i) {
+        return this.getParentValue(i) !== undefined;
+    }
+
+    getLeftValue(i) {
+        return this.treeSequence[this.getLeftIndex(i)];
+    }
+
+    getRightValue(i) {
+        return this.treeSequence[this.getRightIndex(i)];
+    }
+
+    getParentValue(i) {
+        return this.treeSequence[this.getParentIndex(i)];
+    }
+
+    getLeftIndex(i) {
+        return i * 2 + 1;
+    }
+
+    getRightIndex(i) {
+        return i * 2 + 2;
+    }
+
+    getParentIndex(i) {
+        return Math.floor((i - 1) / 2);
+    }
+
+    getNodeValue(i) {
+        return this.treeSequence[i];
+    }
+
+    getNodeData(i) {
+        return this.dataForIndex[i];
+    }
+
+    setNodeValue(i, value) {
+        this.treeSequence[i] = value;
+    }
+
+    setNodeData(i, data) {
+        this.dataForIndex[i] = data;
+    }
+
+    setLeftChildValue(i, value) {
+        this.setNodeValue(this.getLeftIndex(i), value);
+    }
+
+    setRightChildValue(i, value) {
+        this.setNodeValue(this.getRightIndex(i), value);
+    }
+
+    swapValues(nodeAIndex, nodeBIndex) {
+        let a = this.getNodeValue(nodeAIndex);
+        let b = this.getNodeValue(nodeBIndex);
+        let dataA = this.getNodeData(nodeAIndex);
+        let dataB = this.getNodeData(nodeBIndex);
+        if (a === undefined || b === undefined)
+            return false;
+        this.setNodeValue(nodeAIndex, b);
+        this.setNodeValue(nodeBIndex, a);
+        this.setNodeData(nodeAIndex, dataB);
+        this.setNodeData(nodeBIndex, dataA);
+        return true;
+    }
+
+    isNodeValueSmallerThanChildren(nodeIndex) {
         // Note we are not taking in consideration a false return for cases
         // when the node and parent value are the same.
-        if (node.hasLeftChild()) {
-            if (node.value > node.left.value)
+        if (this.hasLeft(nodeIndex)) {
+            if (this.getNodeValue(nodeIndex) > this.getLeftValue(nodeIndex))
                 return false;
         }
-        if (node.hasRightChild()) {
-            if (node.value > node.right.value)
+        if (this.hasRight(nodeIndex)) {
+            if (this.getNodeValue(nodeIndex) > this.getRightValue(nodeIndex))
                 return false;
         }
         return true;
     }
-    isNodeValueGreaterThanChildren(node) {
-        if (node.hasLeftChild()) {
-            if (node.value < node.left.value)
+
+    isNodeValueGreaterThanChildren(nodeIndex) {
+        // Note we are not taking in consideration a false return for cases
+        // when the node and parent value are the same.
+        if (this.hasLeft(nodeIndex)) {
+            if (this.getNodeValue(nodeIndex) < this.getLeftValue(nodeIndex))
                 return false;
         }
-        if (node.hasRightChild()) {
-            if (node.value < node.right.value)
+        if (this.hasRight(nodeIndex)) {
+            if (this.getNodeValue(nodeIndex) < this.getRightValue(nodeIndex))
                 return false;
         }
         return true;
     }
-    isNodeValueSmallerThanParent(node) {
+
+    isNodeValueSmallerThanParent(nodeIndex) {
         // Note we are not taking in consideration a false return for cases
         // when the node and parent value are the same.
-        if (!node.parent) {
+        if (!this.hasParent(nodeIndex)) {
             return false;
         }
-        return node.value < node.parent.value;
+        return this.getNodeValue(nodeIndex) < this.getParentValue(nodeIndex);
     }
-    isNodeValueGreaterThanParent(node) {
+
+    isNodeValueGreaterThanParent(nodeIndex) {
         // Note we are not taking in consideration a false return for cases
         // when the node and parent value are the same.
-        if (!node.parent) {
+        if (!this.hasParent(nodeIndex)) {
             return false;
         }
-        return node.value > node.parent.value;
+        return this.getNodeValue(nodeIndex) > this.getParentValue(nodeIndex);
+    }
+
+    // Traverses
+    inOrderTraverse(nodeIndex = 0) {
+        let result = [];
+        if (this.hasLeft(nodeIndex)) {
+            result.push(...this.inOrderTraverse(this.getLeftIndex(nodeIndex)));
+        }
+        result.push(nodeIndex);
+        if (this.hasRight(nodeIndex)) {
+            result.push(...this.inOrderTraverse(this.getRightIndex(nodeIndex)));
+        }
+        return result;
+    }
+
+    postOrderTraverse(nodeIndex = 0) {
+        let result = [];
+        if (this.hasLeft(nodeIndex)) {
+            result.push(...this.postOrderTraverse(this.getLeftIndex(nodeIndex)));
+        }
+        if (this.hasRight(nodeIndex)) {
+            result.push(...this.postOrderTraverse(this.getRightIndex(nodeIndex)));
+        }
+        result.push(nodeIndex);
+        return result;
+    }
+
+    levelOrderTraverse() {
+        let result = [];
+        let traverseQueue = [];
+        let currentIndex = 0;
+        while (currentIndex) {
+            result.push(currentIndex);
+            if (this.hasLeft(currentIndex))
+                traverseQueue.push(this.getLeftIndex(currentIndex));
+            if (this.hasRight(currentIndex))
+                traverseQueue.push(this.getRightIndex(currentIndex));
+            currentIndex = traverseQueue.shift();
+        }
+        return result;
+    }
+
+    // Test utils
+    count() {
+        return this.treeSequence.length;
+    }
+
+    isCorrect() {
+        if (this.count() === 0)
+            return true;
+        let check = this.type === "min" ? (i) => this.isNodeValueSmallerThanChildren(i) : (i) => this.isNodeValueGreaterThanChildren(i);
+        return this.treeSequence.map(check).every(x => x);
+    }
+
+    switchType() {
+        this.type = this.type === "min" ? "max" : "min";
+        this.heapfy();
     }
 }
+
