@@ -1,17 +1,17 @@
-import {BinaryNode} from "./BinaryNode";
-import {add} from "husky";
 
 // Data structure written by Mateus Pimentel
 export class FastHeap {
     treeSequence : number[] = [];
+    dataForIndex : any[] = [];
     type: "min" | "max";
     constructor(type: "min" | "max" = "min") {
         this.type = type;
     }
 
     // This operation is the same for max and min heap
-    addValue(value: number): void {
+    addValue(value: number, data : any = undefined): void {
         this.treeSequence.push(value);
+        this.dataForIndex.push(value);
 
         // Once the node is added, we need to bubble it up
         this.bubbleUpNode(this.treeSequence.length - 1);
@@ -87,37 +87,64 @@ export class FastHeap {
     private heapfy() {
 
         let tree = this.treeSequence
+        let data = this.dataForIndex
 
         this.treeSequence = []
+        this.dataForIndex = []
 
+        let i = 0;
         tree.forEach(value=>{
-            this.addValue(value)
+            i++;
+            this.addValue(value,data[i])
         })
 
 
     }
 
 
-    public peek() : number {
+    public peek(getData = false) : number | {value: number, data: number} {
+        if(getData){
+            return {
+                value: this.treeSequence[0],
+                data: this.dataForIndex[0]
+            }
+        }
         return this.treeSequence[0]
     }
 
-    public poll() : number {
+    public poll(getData = false) :  number | {value: number, data: number} {
 
         if(this.treeSequence.length === 0) throw new Error("Can't poll from empty heap")
 
         let lastValue = this.treeSequence.pop()
+        let lastData = this.dataForIndex.pop()
 
-        if(this.treeSequence.length === 0) return lastValue
+        if(this.treeSequence.length === 0)
+            if(getData){
+                return {
+                    value: lastValue,
+                    data: lastData
+                }
+            } else
+            return lastValue
 
 
         let returnValue = this.treeSequence[0]
+        let returnData = this.dataForIndex[0]
 
         this.treeSequence[0] = lastValue
+        this.dataForIndex[0] = lastData
 
         // Sift down the now root node
         this.siftDownNode(0)
 
+
+        if(getData){
+            return {
+                value: returnValue,
+                data: returnData
+            }
+        } else
         return returnValue;
     }
 
@@ -162,8 +189,16 @@ export class FastHeap {
         return this.treeSequence[i]
     }
 
+    getNodeData(i : number){
+        return this.dataForIndex[i]
+    }
+
     setNodeValue(i : number,value : number){
         this.treeSequence[i] = value
+    }
+
+    setNodeData(i : number,data : any){
+        this.dataForIndex[i] = data
     }
 
     setLeftChildValue(i : number,value : number){
@@ -178,11 +213,17 @@ export class FastHeap {
         let a = this.getNodeValue(nodeAIndex)
         let b = this.getNodeValue(nodeBIndex)
 
+        let dataA = this.getNodeData(nodeAIndex)
+        let dataB = this.getNodeData(nodeBIndex)
+
         if(a === undefined || b === undefined)
             return false
 
         this.setNodeValue(nodeAIndex,b)
         this.setNodeValue(nodeBIndex,a)
+
+        this.setNodeData(nodeAIndex,dataB)
+        this.setNodeData(nodeBIndex,dataA)
 
         return true
     }
@@ -315,10 +356,6 @@ export class FastHeap {
     public switchType() {
         this.type = this.type === "min" ? "max" : "min";
         this.heapfy()
-    }
-
-    getSortedElements(){
-        return this.treeSequence.sort()
     }
 
 

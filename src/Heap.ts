@@ -1,5 +1,4 @@
 import {BinaryNode} from "./BinaryNode";
-import {add} from "husky";
 
 // Data structure written by Mateus Pimentel
 export class Heap {
