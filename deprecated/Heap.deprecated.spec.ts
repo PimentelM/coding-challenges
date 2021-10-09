@@ -1,5 +1,5 @@
 import {Heap} from "./Heap.deprecated";
-import {BinaryNode} from "./BinaryNode";
+import {BinaryNode} from "../src/BinaryNode";
 
 describe.skip(`Testing Heap`, () => {
     let heap : Heap;

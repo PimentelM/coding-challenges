@@ -1,4 +1,4 @@
-import {BinaryNode} from "./BinaryNode";
+import {BinaryNode} from "../src/BinaryNode";
 
 // Data structure written by Mateus Pimentel
 export class Heap {

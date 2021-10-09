@@ -1,20 +1,23 @@
+import {Edge, IGraphNode} from "./types";
+
 // Data structure written by Mateus Pimentel
-export class GraphNode {
-    id: Id; // string | number
+export class GraphNode implements IGraphNode {
+    label: string; // string | number
     data: any;
-    adjacentTable : { [id: Id]: Edge } = {} // { [id]: { node, weight } }
+    adjacentTable : { [label: string]: Edge } = {} // { [label]: { node, weight } }
     isDirected = false;
 
-    constructor(value : Id, data = {}) {
+    constructor(label : string, data = {}, isDirected = false) {
 
-        this.id = value;
+        this.isDirected = isDirected;
+        this.label = label;
         this.data = data;
     }
 
     addAdjacent(node : GraphNode, weight: number = 1){
-        if(this.isAdjacent(node.id)) return;
+        if(this.isAdjacent(node.label)) return;
 
-        this.adjacentTable[node.id] = {node, weight}
+        this.adjacentTable[node.label] = {node, weight}
 
         if(!this.isDirected){
             node.addAdjacent(this,weight)
@@ -25,23 +28,11 @@ export class GraphNode {
         return Object.values(this.adjacentTable)
     }
 
-    isAdjacent(id : Id) : boolean {
-        return !!this.adjacentTable[id]
+    isAdjacent(label : string) : boolean {
+        return !!this.adjacentTable[label]
     }
 
 }
 
 
 
-
-
-
-
-
-
-interface Edge {
-    node: GraphNode;
-    weight: number;
-}
-
-type Id = string | number

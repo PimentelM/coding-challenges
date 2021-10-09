@@ -31,8 +31,8 @@ class GraphNode {
     adjacencyTable = {} // { [id]: { node, weight } }
     isDirected = false;
 
-    constructor(value, data = {}) {
-
+    constructor(value, data = {}, isDirected = false) {
+        this.isDirected = isDirected;
         this.value = value;
         this.data = data;
     }
