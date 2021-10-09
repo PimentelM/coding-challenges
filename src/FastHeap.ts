@@ -1,50 +1,50 @@
-
 // Data structure written by Mateus Pimentel
 export class FastHeap {
-    treeSequence : number[] = [];
-    dataForIndex : any[] = [];
+    treeSequence: number[] = [];
+    dataForIndex: any[] = [];
     type: "min" | "max";
+
     constructor(type: "min" | "max" = "min") {
         this.type = type;
     }
 
     // This operation is the same for max and min heap
-    addValue(value: number, data : any = undefined): void {
+    addValue(value: number, data: any = undefined): void {
         this.treeSequence.push(value);
-        this.dataForIndex.push(value);
+        this.dataForIndex.push(data);
 
         // Once the node is added, we need to bubble it up
         this.bubbleUpNode(this.treeSequence.length - 1);
     }
 
     // TODO: Should check if return value is correct
-    private siftDownNode(nodeIndex: number){
+    private siftDownNode(nodeIndex: number) {
         // Switch node positions with it's left child while it's value is:
         // Lesser than it's child when doing a MAX heap
         // Greater than it's child when doing a MIN heap
 
-        if(!this.hasLeft(nodeIndex)) return false
+        if (!this.hasLeft(nodeIndex)) return false
 
         let hasSiftedDown = false;
 
-        while(this.hasLeft(nodeIndex)){
+        while (this.hasLeft(nodeIndex)) {
             let childIndex = this.getLeftIndex(nodeIndex)
 
-            if(this.hasRight(nodeIndex)){
+            if (this.hasRight(nodeIndex)) {
                 let doChooseRightChild = this.type === "min" ?
                     this.getRightValue(nodeIndex) < this.getLeftValue(nodeIndex)
                     : this.getRightValue(nodeIndex) > this.getLeftValue(nodeIndex)
-                if(doChooseRightChild){
+                if (doChooseRightChild) {
                     childIndex = this.getRightIndex(nodeIndex)
                 }
             }
 
             let shouldSift = this.type === "min" ?
-                    this.getNodeValue(childIndex) < this.getNodeValue(nodeIndex)
-                :   this.getNodeValue(childIndex) > this.getNodeValue(nodeIndex)
+                this.getNodeValue(childIndex) < this.getNodeValue(nodeIndex)
+                : this.getNodeValue(childIndex) > this.getNodeValue(nodeIndex)
 
-            if (shouldSift){
-                if (this.swapValues(nodeIndex,childIndex)) {
+            if (shouldSift) {
+                if (this.swapValues(nodeIndex, childIndex)) {
                     nodeIndex = childIndex;
                     hasSiftedDown = true;
                 }
@@ -59,7 +59,7 @@ export class FastHeap {
 
 
     // TODO: Should check if return value is correct
-    private bubbleUpNode(nodeIndex : number) {
+    private bubbleUpNode(nodeIndex: number) {
         // Switch node positions with it's parent while it's value is:
         // Lesser than it's parent when doing a MIN heap
         // Greater than it's parent when doing a MAX heap
@@ -67,12 +67,12 @@ export class FastHeap {
         if (!this.hasParent(nodeIndex)) return false;
 
         let hasBubbled = false;
-        let hasToBubble = this.type === "min" ? (i : number) => this.isNodeValueSmallerThanParent(i) : (i: number) => this.isNodeValueGreaterThanParent(i)
+        let hasToBubble = this.type === "min" ? (i: number) => this.isNodeValueSmallerThanParent(i) : (i: number) => this.isNodeValueGreaterThanParent(i)
 
         while (hasToBubble(nodeIndex)) {
-            if(!this.hasParent(nodeIndex)) break;
+            if (!this.hasParent(nodeIndex)) break;
             let parentIndex = this.getParentIndex(nodeIndex)
-            if (this.swapValues(nodeIndex,parentIndex)) {
+            if (this.swapValues(nodeIndex, parentIndex)) {
                 nodeIndex = parentIndex
                 hasBubbled = true;
             } else {
@@ -93,40 +93,32 @@ export class FastHeap {
         this.dataForIndex = []
 
         let i = 0;
-        tree.forEach(value=>{
+        tree.forEach(value => {
             i++;
-            this.addValue(value,data[i])
+            this.addValue(value, data[i])
         })
 
 
     }
 
 
-    public peek(getData = false) : number | {value: number, data: number} {
-        if(getData){
-            return {
-                value: this.treeSequence[0],
-                data: this.dataForIndex[0]
-            }
-        }
+    public peek(): number {
+
         return this.treeSequence[0]
     }
 
-    public poll(getData = false) :  number | {value: number, data: number} {
+    public pollWithData(): { value: number, data: number } {
 
-        if(this.treeSequence.length === 0) throw new Error("Can't poll from empty heap")
+        if (this.treeSequence.length === 0) throw new Error("Can't poll from empty heap")
 
         let lastValue = this.treeSequence.pop()
         let lastData = this.dataForIndex.pop()
 
-        if(this.treeSequence.length === 0)
-            if(getData){
-                return {
-                    value: lastValue,
-                    data: lastData
-                }
-            } else
-            return lastValue
+        if (this.treeSequence.length === 0)
+            return {
+                value: lastValue,
+                data: lastData
+            }
 
 
         let returnValue = this.treeSequence[0]
@@ -139,91 +131,118 @@ export class FastHeap {
         this.siftDownNode(0)
 
 
-        if(getData){
-            return {
-                value: returnValue,
-                data: returnData
-            }
-        } else
+        return {
+            value: returnValue,
+            data: returnData
+        }
+    }
+
+    public peekWithData(): { value: number, data: number } {
+        return {
+            value: this.treeSequence[0],
+            data: this.dataForIndex[0]
+        }
+    }
+
+    public poll(getData = false): number {
+
+        if (this.treeSequence.length === 0) throw new Error("Can't poll from empty heap")
+
+        let lastValue = this.treeSequence.pop()
+        let lastData = this.dataForIndex.pop()
+
+        if (this.treeSequence.length === 0)
+            return lastValue
+
+
+        let returnValue = this.treeSequence[0]
+
+        this.treeSequence[0] = lastValue
+        this.dataForIndex[0] = lastData
+
+        // Sift down the now root node
+        this.siftDownNode(0)
+
+
         return returnValue;
     }
 
     // Tree sequence operations
-    hasLeft(i : number){
+    hasLeft(i: number) {
         return this.getLeftValue(i) !== undefined
     }
 
-    hasRight(i : number){
+    hasRight(i: number) {
         return this.getRightValue(i) !== undefined
     }
 
-    hasParent(i : number){
+    hasParent(i: number) {
         return this.getParentValue(i) !== undefined
     }
 
-    getLeftValue(i : number){
+    getLeftValue(i: number) {
         return this.treeSequence[this.getLeftIndex(i)]
     }
 
-    getRightValue(i : number){
+    getRightValue(i: number) {
         return this.treeSequence[this.getRightIndex(i)]
     }
 
-    getParentValue(i: number){
+    getParentValue(i: number) {
         return this.treeSequence[this.getParentIndex(i)]
     }
 
-    getLeftIndex(i : number){
+    getLeftIndex(i: number) {
         return i * 2 + 1
     }
 
-    getRightIndex(i : number){
+    getRightIndex(i: number) {
         return i * 2 + 2
     }
 
-    getParentIndex(i : number){
+    getParentIndex(i: number) {
         return Math.floor((i - 1) / 2)
     }
 
-    getNodeValue(i : number){
+    getNodeValue(i: number) {
         return this.treeSequence[i]
     }
 
-    getNodeData(i : number){
+    getNodeData(i: number) {
         return this.dataForIndex[i]
     }
 
-    setNodeValue(i : number,value : number){
+    setNodeValue(i: number, value: number) {
         this.treeSequence[i] = value
     }
 
-    setNodeData(i : number,data : any){
+    setNodeData(i: number, data: any) {
         this.dataForIndex[i] = data
     }
 
-    setLeftChildValue(i : number,value : number){
-        this.setNodeValue(this.getLeftIndex(i),value)
+    setLeftChildValue(i: number, value: number) {
+        this.setNodeValue(this.getLeftIndex(i), value)
     }
 
-    setRightChildValue(i : number,value : number){
-        this.setNodeValue(this.getRightIndex(i),value)
+    setRightChildValue(i: number, value: number) {
+        this.setNodeValue(this.getRightIndex(i), value)
     }
 
-    swapValues(nodeAIndex :number, nodeBIndex : number){
+    swapValues(nodeAIndex: number, nodeBIndex: number) {
         let a = this.getNodeValue(nodeAIndex)
         let b = this.getNodeValue(nodeBIndex)
 
         let dataA = this.getNodeData(nodeAIndex)
         let dataB = this.getNodeData(nodeBIndex)
 
-        if(a === undefined || b === undefined)
+        if (a === undefined || b === undefined)
             return false
 
-        this.setNodeValue(nodeAIndex,b)
-        this.setNodeValue(nodeBIndex,a)
+        this.setNodeValue(nodeAIndex, b)
+        this.setNodeValue(nodeBIndex, a)
 
-        this.setNodeData(nodeAIndex,dataB)
-        this.setNodeData(nodeBIndex,dataA)
+        this.setNodeData(nodeAIndex, dataB)
+        this.setNodeData(nodeBIndex, dataA)
 
         return true
     }
@@ -285,16 +304,16 @@ export class FastHeap {
 
     // Traverses
 
-    inOrderTraverse(nodeIndex = 0) : number[]{
+    inOrderTraverse(nodeIndex = 0): number[] {
         let result = [];
 
-        if (this.hasLeft(nodeIndex)){
+        if (this.hasLeft(nodeIndex)) {
             result.push(...this.inOrderTraverse(this.getLeftIndex(nodeIndex)))
         }
 
-        result.push( nodeIndex )
+        result.push(nodeIndex)
 
-        if(this.hasRight(nodeIndex)){
+        if (this.hasRight(nodeIndex)) {
             result.push(...this.inOrderTraverse(this.getRightIndex(nodeIndex)))
         }
 
@@ -302,14 +321,14 @@ export class FastHeap {
         return result
     }
 
-    postOrderTraverse(nodeIndex = 0) : number[]{
+    postOrderTraverse(nodeIndex = 0): number[] {
         let result = [];
 
-        if (this.hasLeft(nodeIndex)){
+        if (this.hasLeft(nodeIndex)) {
             result.push(...this.postOrderTraverse(this.getLeftIndex(nodeIndex)))
         }
 
-        if(this.hasRight(nodeIndex)){
+        if (this.hasRight(nodeIndex)) {
             result.push(...this.postOrderTraverse(this.getRightIndex(nodeIndex)))
         }
 
@@ -339,17 +358,17 @@ export class FastHeap {
 
     // Test utils
 
-    public count(){
+    public count() {
         return this.treeSequence.length
     }
 
-    public isCorrect() : boolean{
+    public isCorrect(): boolean {
 
-        if(this.count() === 0) return true
+        if (this.count() === 0) return true
 
-        let check = this.type === "min" ? (i : number) => this.isNodeValueSmallerThanChildren(i) :(i : number) => this.isNodeValueGreaterThanChildren(i)
+        let check = this.type === "min" ? (i: number) => this.isNodeValueSmallerThanChildren(i) : (i: number) => this.isNodeValueGreaterThanChildren(i)
 
-        return this.treeSequence.map(check).every(x=>x)
+        return this.treeSequence.map(check).every(x => x)
 
     }
 

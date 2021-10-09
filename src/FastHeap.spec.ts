@@ -1,6 +1,6 @@
 import {FastHeap} from "./FastHeap";
 
-describe(`Testing Heap`, () => {
+describe(`Testing FastHeap`, () => {
     let heap : FastHeap;
     let count : number;
     let smallestElementAdded = Infinity;
@@ -14,7 +14,8 @@ describe(`Testing Heap`, () => {
             .split(' ')
             .map(Number)
             .forEach(value => {
-                heap.addValue(value);
+                let data = `data for ${value}`
+                heap.addValue(value, data);
                 count++;
                 if(value < smallestElementAdded){
                     smallestElementAdded = value;
@@ -43,6 +44,15 @@ describe(`Testing Heap`, () => {
 
 
     });
+
+    it('Should be able to poll with data', () => {
+        while(heap.count() > 0){
+            let { data, value } = heap.pollWithData()
+
+            expect(data).toBe(`data for ${value}`)
+        }
+
+    })
 
     it('If heap is switched to max heap, all parent nodes should be greater than their children', () => {
 
