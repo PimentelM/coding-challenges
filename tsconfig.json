@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es2019",
+    "sourceMap": true,
+    "lib": ["es2019", "dom"],
+    "outDir": "dist",
+    "noImplicitAny": true,
+    "esModuleInterop": false
+   },
+  "exclude": [
+    "node_modules",
+    "js",
+    "**/*.spec.ts",
+    "challenges"
+  ],
+  "include": [
+    "src",
+  ],
+  "types": ["@types/jest"]
+
+}
