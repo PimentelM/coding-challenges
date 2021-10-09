@@ -1,6 +1,6 @@
 
 function getBinaryTreeHeight(tree){
-    let getDepht = function(node) : number {
+    let getDepht = function(node) {
         if(!node) return 0;
         if (!node.right && !node.left) return 0;
 
