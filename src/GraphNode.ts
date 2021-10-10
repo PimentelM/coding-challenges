@@ -5,7 +5,7 @@ export class GraphNode implements IGraphNode {
     label: string; // string | number
     data: any;
     adjacentTable : { [label: string]: Edge } = {} // { [label]: { node, weight } }
-    isDirected = false;
+    isDirected;
 
     constructor(label : string, data = {}, isDirected = false) {
 

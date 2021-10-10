@@ -12,4 +12,5 @@ export interface Edge {
 
 export interface IGraph {
     nodeTable : {[label: string] : IGraphNode}
+    getNode(label: string) : IGraphNode
 }

@@ -2,7 +2,7 @@ import {GraphNode} from "./GraphNode";
 import {IGraph} from "./types";
 
 
-
+// Data structure written by Mateus Pimentel
 export class Graph implements IGraph {
 
     nodeTable : {[label: string] : GraphNode}
@@ -33,6 +33,10 @@ export class Graph implements IGraph {
 
             node1.addAdjacent(node2, weight)
         }
+    }
+
+    getNode(label: string): GraphNode {
+        return this.nodeTable[label];
     }
 
 
