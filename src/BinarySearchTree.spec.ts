@@ -1,7 +1,7 @@
 import { BinarySearchTree } from './BinarySearchTree';
 
 describe(`Testing Binary Search Tree`, () => {
-  let tree;
+  let tree: BinarySearchTree;
   beforeEach(() => {
     tree = new BinarySearchTree();
 
