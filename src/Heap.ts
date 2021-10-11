@@ -308,8 +308,6 @@ export class Heap {
     }
 
     isNodeValueSmallerThanParent(nodeIndex: number): boolean {
-        // Note we are not taking in consideration a false return for cases
-        // when the node and parent value are the same.
 
         if (!this.hasParent(nodeIndex)) {
             return false
@@ -319,8 +317,6 @@ export class Heap {
     }
 
     isNodeValueGreaterThanParent(nodeIndex: number): boolean {
-        // Note we are not taking in consideration a false return for cases
-        // when the node and parent value are the same.
 
         if (!this.hasParent(nodeIndex)) {
             return false
@@ -330,8 +326,6 @@ export class Heap {
     }
 
     isNodeValueSmallerThanOrEqualToParent(nodeIndex: number): boolean {
-        // Note we are not taking in consideration a false return for cases
-        // when the node and parent value are the same.
 
         if (!this.hasParent(nodeIndex)) {
             return false
@@ -341,8 +335,6 @@ export class Heap {
     }
 
     isNodeValueGreaterThanOrEqualToParent(nodeIndex: number): boolean {
-        // Note we are not taking in consideration a false return for cases
-        // when the node and parent value are the same.
 
         if (!this.hasParent(nodeIndex)) {
             return false
